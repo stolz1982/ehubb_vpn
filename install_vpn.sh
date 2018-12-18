@@ -31,15 +31,17 @@ if ! command -v openvpn > /dev/null; then
         exit
     fi
 fi
-sudo cp $VPN_HOME_DIR/* $INST_DIR
+
+sudo cp $VPN_HOME_DIR/ca.crt $INST_DIR
+sudo cp $VPN_HOME_DIR/$USERNAME.crt $INST_DIR
+sudo cp $VPN_HOME_DIR/$USERNAME.key $INST_DIR
+
+
 sudo rm $OV_DEFAULT_FILE
 
 echo "AUTOSTART=\"all\"" >> $OV_DEFAULT_FILE
 echo "OPTARGS=\"\"" >> $OV_DEFAULT_FILE
 echo "OMIT_SENDSIGS=0" >> $OV_DEFAULT_FILE
-
-
-cd $INST_DIR
 
 sudo rm -rf $INST_DIR/.secrets
 
@@ -67,7 +69,3 @@ echo "pull dhcp-options" >> $INST_DIR/client.conf
 sudo systemctl enable openvpn@client.service
 sudo systemctl daemon-reload
 sudo systemctl start openvpn@client.service
-
-
-
-
