@@ -43,7 +43,6 @@ cd $INST_DIR
 
 sudo rm -rf $INST_DIR/.secrets
 
-echo "$USERNAME" > $INST_DIR/.secrets
 echo "$PASSWORD" >> $INST_DIR/.secrets
 
 sudo rm $INST_DIR/$USERNAME.ovpn
@@ -52,6 +51,7 @@ echo "tls-client" >> $INST_DIR/$USERNAME.ovpn
 echo "dev tap" >> $INST_DIR/$USERNAME.ovpn
 echo "proto udp" >> $INST_DIR/$USERNAME.ovpn
 echo "remote 90.187.46.229 1194" >> $INST_DIR/$USERNAME.ovpn
+echo "askpass $INST_DIR/.secrets" >> $INST_DIR/$USERNAME.ovpn
 echo "resolv-retry infinite" >> $INST_DIR/$USERNAME.ovpn
 echo "nobind" >> $INST_DIR/$USERNAME.ovpn
 echo "persist-key" >> $INST_DIR/$USERNAME.ovpn
