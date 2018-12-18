@@ -45,24 +45,23 @@ sudo rm -rf $INST_DIR/.secrets
 
 echo "$PASSWORD" >> $INST_DIR/.secrets
 
-sudo rm $INST_DIR/$USERNAME.ovpn
+sudo rm $INST_DIR/client.ovpn
 
-echo "tls-client" >> $INST_DIR/$USERNAME.ovpn
-echo "dev tap" >> $INST_DIR/$USERNAME.ovpn
-echo "proto udp" >> $INST_DIR/$USERNAME.ovpn
-echo "remote 90.187.46.229 1194" >> $INST_DIR/$USERNAME.ovpn
-echo "askpass $INST_DIR/.secrets" >> $INST_DIR/$USERNAME.ovpn
-echo "resolv-retry infinite" >> $INST_DIR/$USERNAME.ovpn
-echo "nobind" >> $INST_DIR/$USERNAME.ovpn
-echo "persist-key" >> $INST_DIR/$USERNAME.ovpn
-echo "persist-tun" >> $INST_DIR/$USERNAME.ovpn
-echo "ca ca.crt" >> $INST_DIR/$USERNAME.ovpn
-echo "cert $USERNAME.crt" >> $INST_DIR/$USERNAME.ovpn
-echo "key $USERNAME.key" >> $INST_DIR/$USERNAME.ovpn
-echo "comp-lzo" >> $INST_DIR/$USERNAME.ovpn
-echo "verb 3" >> $INST_DIR/$USERNAME.ovpn
-echo "pull dhcp-options" >> $INST_DIR/$USERNAME.ovpn
-echo "auth-users-pass .secrets" >> $INST_DIR/$USERNAME.ovpn
+echo "tls-client" >> $INST_DIR/client.conf
+echo "dev tap" >> $INST_DIR/client.conf
+echo "proto udp" >> $INST_DIR/client.conf
+echo "remote 90.187.46.229 1194" >> $INST_DIR/client.conf
+echo "askpass $INST_DIR/.secrets" >> $INST_DIR/client.conf
+echo "resolv-retry infinite" >> $INST_DIR/client.conf
+echo "nobind" >> $INST_DIR/client.conf
+echo "persist-key" >> $INST_DIR/client.conf
+echo "persist-tun" >> $INST_DIR/client.conf
+echo "ca ca.crt" >> $INST_DIR/client.conf
+echo "cert $USERNAME.crt" >> $INST_DIR/client.conf
+echo "key $USERNAME.key" >> $INST_DIR/client.conf
+echo "comp-lzo" >> $INST_DIR/client.conf
+echo "verb 3" >> $INST_DIR/client.conf
+echo "pull dhcp-options" >> $INST_DIR/client.conf
 
 #https://www.smarthomebeginner.com/configure-openvpn-to-autostart-linux/
 sudo systemctl enable openvpn@client.service
