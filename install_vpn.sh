@@ -2,6 +2,23 @@
 INST_DIR="/etc/openvpn"
 OV_DEFAULT_FILE="/etc/default/openvpn"
 
+echo "Enter the KIOSK ID, must be unique to the VPN Username:""
+read $USERNAME
+
+echo "Enter the VPN Password:""
+read $PASSWORD
+
+VPN_HOME_DIR="/home/administrator/$USERNAME"
+
+if [ ! -d "$VPN_HOME_DIR" ] 
+then
+    echo "The folder $VPN_HOME_DIR containing the vpn files does not exist!"
+    exit 1
+fi
+
+echo "Ensure that the openvpn files has been copied in the E-HUBB local file system in /etc/openvpn (ca.crt, $USERNAME.crt, $USERNAME.key)"
+
+
 sudo systemctl stop openvpn@client.service
 sudo systemctl disable openvpn@client.service
 
@@ -14,8 +31,8 @@ if ! command -v openvpn > /dev/null; then
         exit
     fi
 fi
-
-rm $OV_DEFAULT_FILE
+sudo cp $VPN_HOME_DIR/* $INST_DIR
+sudo rm $OV_DEFAULT_FILE
 
 echo "AUTOSTART=\"all\"" >> $OV_DEFAULT_FILE
 echo "OPTARGS=\"\"" >> $OV_DEFAULT_FILE
@@ -24,18 +41,12 @@ echo "OMIT_SENDSIGS=0" >> $OV_DEFAULT_FILE
 
 cd $INST_DIR
 
-echo "Enter the KIOSK ID, must be unique to the VPN Username:""
-read $USERNAME
-
-echo "Enter the VPN Password:""
-read $PASSWORD
-
-rm -rf $INST_DIR/.secrets
+sudo rm -rf $INST_DIR/.secrets
 
 echo "$USERNAME" > $INST_DIR/.secrets
 echo "$PASSWORD" >> $INST_DIR/.secrets
 
-rm -rf $INST_DIR/$USERNAME.ovpn
+sudo rm $INST_DIR/$USERNAME.ovpn
 
 echo "tls-client" >> $INST_DIR/$USERNAME.ovpn
 echo "dev tap" >> $INST_DIR/$USERNAME.ovpn
@@ -52,8 +63,6 @@ echo "comp-lzo" >> $INST_DIR/$USERNAME.ovpn
 echo "verb 3" >> $INST_DIR/$USERNAME.ovpn
 echo "pull dhcp-options" >> $INST_DIR/$USERNAME.ovpn
 echo "auth-users-pass .secrets" >> $INST_DIR/$USERNAME.ovpn
-
-echo "Ensure that the openvpn files has been copied in the E-HUBB local file system in /etc/openvpn (ca.crt, $USERNAME.crt, $USERNAME.key)"
 
 #https://www.smarthomebeginner.com/configure-openvpn-to-autostart-linux/
 sudo systemctl enable openvpn@client.service
