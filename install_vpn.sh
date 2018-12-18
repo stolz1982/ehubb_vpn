@@ -3,10 +3,10 @@ INST_DIR="/etc/openvpn"
 OV_DEFAULT_FILE="/etc/default/openvpn"
 
 echo "Enter the KIOSK ID, must be unique to the VPN Username:""
-read $USERNAME
+read USERNAME
 
 echo "Enter the VPN Password:""
-read $PASSWORD
+read PASSWORD
 
 VPN_HOME_DIR="/home/administrator/$USERNAME"
 
