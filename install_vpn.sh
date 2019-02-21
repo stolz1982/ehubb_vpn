@@ -15,20 +15,20 @@ if [ ! -d "$VPN_HOME_DIR" ]
 then
 	echo "The folder $VPN_HOME_DIR containing does not exist!"
     	echo "##########################################"
-	echo "Content of $VPN_HOME_DIR:"
-	echo "$(ls -lha $VPN_HOME_DIR)
+	echo "Content of $KO_DESKTOP_DIR:"
+	echo "$(ls -1 $KO_DESKTOP_DIR)"
     	echo "##########################################"
-	echo "Please ensure that you have copied the VPN folder which has the name of the KIOSK ID! Did you copied the folder to the kioskoperator's Desktop?"
+	echo "Please ensure that you have copied the VPN folder which has the name of the KIOSK ID! Did you copied the folder to the kioskoperators Desktop?"
 	echo "Enter y for YES"
 	echo "Enter n for NO"
 	read COPYMSG
-		if [ $COPYMSG -e "y" ]
+		if [ $COPYMSG = "y" ]
 		then
 			VPNFODLERCHECK
 		else
 			echo "ERROR: the folder has not been found!"
 			exit 1
-		if
+		fi
 fi
 }
 ###################################
@@ -43,7 +43,7 @@ VPN_HOME_DIR="$KO_DESKTOP_DIR/$USERNAME"
 VPNFOLDERCHECK
 
 #VPN file check
-if [ -e "$VPN_HOME_DIR/ca.crt" ] && [ -e "$VPN_HOME_DIR/$USERNAME.crt ] && [ -e "$VPN_HOME_DIR/$USERNAME.key" ] && [ -e "$VPN_HOME_DIR/README.txt" ] 
+if [ -e "$VPN_HOME_DIR/ca.crt" ] && [ -e "$VPN_HOME_DIR/$USERNAME.crt" ] && [ -e "$VPN_HOME_DIR/$USERNAME.key" ] && [ -e "$VPN_HOME_DIR/README.txt" ] 
 then
 	#READ PASSWORD
 	PASSWORD=$(sudo cat $VPN_HOME_DIR/README.txt)
@@ -56,17 +56,28 @@ fi
 #OPENVPN INSTALLATION
 ##################################
 
-sudo systemctl stop openvpn@client.service 1>/dev/null 2&>1
-sudo systemctl disable openvpn@client.service 1>/dev/null 2&>1
+echo "potential running openvpn client will be stopped"
+sudo systemctl stop openvpn@client.service >/dev/null 2>&1
+echo "openvpn client will be disabled"
+sudo systemctl disable openvpn@client.service >/dev/null 2>&1
+
+
+sudo apt-get -y purge openvpn
+sudo rm -rf /etc/openvpn
 
 if ! command -v openvpn > /dev/null; then
-    sudo apt-get install openvpn
+    sudo apt-get -y install openvpn
     if [ $? != 0 ]; then
         printf "\n\nopenvpn could not be installed!\n"
         printf "\n\nThe installation proccess could not be finished\n"
         exit
     fi
 fi
+
+
+sudo rm $INST_DIR/ca.crt
+sudo rm $INST_DIR/$USERNAME.crt
+sudo rm $INST_DIR/$USERNAME.key
 
 sudo cp $VPN_HOME_DIR/ca.crt $INST_DIR
 sudo cp $VPN_HOME_DIR/$USERNAME.crt $INST_DIR
@@ -83,7 +94,7 @@ sudo rm -rf $INST_DIR/.secrets
 
 echo "$PASSWORD" >> $INST_DIR/.secrets
 
-sudo rm $INST_DIR/client.ovpn
+sudo rm $INST_DIR/client.conf
 
 echo "tls-client" >> $INST_DIR/client.conf
 echo "dev tap" >> $INST_DIR/client.conf
