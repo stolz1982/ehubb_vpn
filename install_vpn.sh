@@ -1,28 +1,64 @@
 #/bin/bash
+
+#################################
+#Variables Declarations
+#################################
 INST_DIR="/etc/openvpn"
 OV_DEFAULT_FILE="/etc/default/openvpn"
+KO_DESKTOP_DIR="/home/kioskoperator/Desktop"
 
-echo "Enter the KIOSK ID, must be unique to the VPN Username:"
-read USERNAME
-
-echo "Enter the VPN Password:"
-read PASSWORD
-
-VPN_HOME_DIR="/home/administrator/$USERNAME"
-
+#################################
+#FUNCTIONS
+#################################
+function VPNFOLDERCHECK {
 if [ ! -d "$VPN_HOME_DIR" ] 
 then
-    echo "The folder $VPN_HOME_DIR containing the vpn files does not exist!"
-    exit 1
+	echo "The folder $VPN_HOME_DIR containing does not exist!"
+    	echo "##########################################"
+	echo "Content of $VPN_HOME_DIR:"
+	echo "$(ls -lha $VPN_HOME_DIR)
+    	echo "##########################################"
+	echo "Please ensure that you have copied the VPN folder which has the name of the KIOSK ID! Did you copied the folder to the kioskoperator's Desktop?"
+	echo "Enter y for YES"
+	echo "Enter n for NO"
+	read COPYMSG
+		if [ $COPYMSG -e "y" ]
+		then
+			VPNFODLERCHECK
+		else
+			echo "ERROR: the folder has not been found!"
+			exit 1
+		if
+fi
+}
+###################################
+#Script start
+##################################
+echo "Enter the KIOSK ID (i.e. KE0004, RW0016 or TA0022):"
+read USERNAME
+
+VPN_HOME_DIR="$KO_DESKTOP_DIR/$USERNAME"
+
+#Call Function
+VPNFOLDERCHECK
+
+#VPN file check
+if [ -e "$VPN_HOME_DIR/ca.crt" ] && [ -e "$VPN_HOME_DIR/$USERNAME.crt ] && [ -e "$VPN_HOME_DIR/$USERNAME.key" ] && [ -e "$VPN_HOME_DIR/README.txt" ] 
+then
+	#READ PASSWORD
+	PASSWORD=$(sudo cat $VPN_HOME_DIR/README.txt)
+else
+	echo "ERROR: Ensure that the folder $VPN_HOME_DIR contains the needed openvpn files (ca.crt, $USERNAME.crt, $USERNAME.key, README.txt)"
+	exit 2
 fi
 
-echo "Ensure that the openvpn files has been copied in the E-HUBB local file system in /etc/openvpn (ca.crt, $USERNAME.crt, $USERNAME.key)"
+##################################
+#OPENVPN INSTALLATION
+##################################
 
+sudo systemctl stop openvpn@client.service 1>/dev/null 2&>1
+sudo systemctl disable openvpn@client.service 1>/dev/null 2&>1
 
-sudo systemctl stop openvpn@client.service
-sudo systemctl disable openvpn@client.service
-
-# Install openvpn
 if ! command -v openvpn > /dev/null; then
     sudo apt-get install openvpn
     if [ $? != 0 ]; then
